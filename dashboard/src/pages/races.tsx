@@ -4,14 +4,18 @@ import {
   List,
   NumberField,
   ReferenceField,
+  ReferenceManyField,
+  ReferenceOneField,
   Show,
+  FunctionField,
   TabbedShowLayout,
   TextField,
   UrlField,
 } from "react-admin";
+import { Stack } from "@mui/material";
 
 export const RaceList = () => (
-  <List>
+  <List storeKey={false}>
     <DataTable>
       <DataTable.Col source="id" />
       <DataTable.NumberCol source="year" />
@@ -65,13 +69,70 @@ export const RaceShow = () => (
         <TextField source="sprint_time" />
       </TabbedShowLayout.Tab>
       <TabbedShowLayout.Tab label="circuit" path="circuit">
-        <div>Please add information about the circuit used in this race!</div>
+        {[
+          "ID",
+          "Circuit_Ref",
+          "Name",
+          "Location",
+          "Country",
+          "Lat",
+          "Lng",
+          "Alt",
+          "Url",
+        ].map((label) => (
+          <ReferenceOneField
+            key={label}
+            label={label}
+            source="circuit_id"
+            reference="circuits"
+            target="id"
+          >
+            <TextField source={label.toLowerCase()} />
+          </ReferenceOneField>
+        ))}
       </TabbedShowLayout.Tab>
       <TabbedShowLayout.Tab label="drivers" path="drivers">
-        <div>Please add information about the drivers in this race!</div>
+        <ReferenceManyField
+          reference="driver_standings"
+          target="race_id"
+          sort={{ field: "position", order: "ASC" }}
+        >
+          <DataTable sort={{ field: "position", order: "ASC" }}>
+            <DataTable.Col source="position" />
+            <DataTable.Col source="points" />
+            <DataTable.Col source="driver_id">
+              <ReferenceField source="driver_id" reference="drivers">
+                <FunctionField
+                  render={(data) =>
+                    `${data.number === "\\N" ? "" : `#${data.number}`} ${data.forename} ${data.surname}`
+                  }
+                />
+              </ReferenceField>
+            </DataTable.Col>
+          </DataTable>
+        </ReferenceManyField>
       </TabbedShowLayout.Tab>
       <TabbedShowLayout.Tab label="contructors" path="contructors">
-        <div>Please add information about the contructors in this race!</div>
+        <ReferenceManyField
+          reference="constructor_standings"
+          target="race_id"
+          sort={{ field: "position", order: "ASC" }}
+        >
+          <DataTable sort={{ field: "position", order: "ASC" }}>
+            <DataTable.Col source="position" />
+            <DataTable.Col source="points" />
+            <DataTable.Col source="constructor_id">
+              <ReferenceField source="constructor_id" reference="constructors">
+                <TextField source="name" />
+              </ReferenceField>
+            </DataTable.Col>
+            <DataTable.Col source="constructor_id" label="Nationality">
+              <ReferenceField source="constructor_id" reference="constructors">
+                <TextField source="nationality" />
+              </ReferenceField>
+            </DataTable.Col>
+          </DataTable>
+        </ReferenceManyField>
       </TabbedShowLayout.Tab>
     </TabbedShowLayout>
   </Show>

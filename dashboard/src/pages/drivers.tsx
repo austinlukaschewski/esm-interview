@@ -6,10 +6,28 @@ import {
   SimpleShowLayout,
   TextField,
   UrlField,
+  CreateButton,
+  ExportButton,
+  TopToolbar,
+  SimpleForm,
+  TextInput,
+  EditButton,
+  DeleteButton,
+  Create,
+  DateInput,
+  required,
+  Edit,
 } from "react-admin";
 
+const DriverListActions = () => (
+  <TopToolbar>
+    <CreateButton />
+    <ExportButton />
+  </TopToolbar>
+);
+
 export const DriverList = () => (
-  <List>
+  <List actions={<DriverListActions />}>
     <DataTable>
       <DataTable.Col source="id" />
       <DataTable.Col source="driver_ref" />
@@ -28,8 +46,15 @@ export const DriverList = () => (
   </List>
 );
 
+const DriverShowActions = () => (
+  <TopToolbar>
+    <EditButton />
+    <DeleteButton />
+  </TopToolbar>
+);
+
 export const DriverShow = () => (
-  <Show>
+  <Show actions={<DriverShowActions />}>
     <SimpleShowLayout>
       <TextField source="id" />
       <TextField source="driver_ref" />
@@ -42,4 +67,32 @@ export const DriverShow = () => (
       <UrlField source="url" />
     </SimpleShowLayout>
   </Show>
+);
+
+export const DriverCreate = () => (
+  <Create redirect="list">
+    <DriverSimpleForm />
+  </Create>
+);
+
+export const DriverEdit = () => {
+  return (
+    <Edit redirect="list">
+      <DriverSimpleForm />
+    </Edit>
+  );
+};
+
+const DriverSimpleForm = () => (
+  <SimpleForm>
+    <TextInput source="id" validate={[required()]} />
+    <TextInput source="driver_ref" validate={[required()]} />
+    <TextInput source="number" validate={[required()]} />
+    <TextInput source="code" validate={[required()]} />
+    <TextInput source="forename" validate={[required()]} />
+    <TextInput source="surname" validate={[required()]} />
+    <DateInput source="dob" validate={[required()]} />
+    <TextInput source="nationality" validate={[required()]} />
+    <TextInput source="url" validate={[required()]} />
+  </SimpleForm>
 );

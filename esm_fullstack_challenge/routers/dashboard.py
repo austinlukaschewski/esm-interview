@@ -7,6 +7,26 @@ from esm_fullstack_challenge.dependencies import get_db, CommonQueryParams
 
 dashboard_router = APIRouter()
 
+@dashboard_router.get("/top_constructors_by_wins")
+def get_top_constructors_by_wins(
+    cqp: CommonQueryParams = Depends(CommonQueryParams),
+    db: DB = Depends(get_db)
+) -> list:
+    base_query_str = "SELECT c.id, c.name, c.nationality, SUM(cr.points) as points FROM constructors c INNER JOIN constructor_results cr ON c.id = cr.constructor_id"
+    query_str = query_builder(
+        custom_select=base_query_str,
+        order_by=cqp.order_by or [('points', 'desc')],
+        limit=cqp.limit,
+        offset=cqp.offset,
+        filter_by=cqp.filter_by,
+        group_by=['c.id']
+    )
+
+    with db.get_connection() as conn:
+        df = pd.read_sql_query(query_str, conn)
+        constructors = list(df.to_dict(orient='records'))
+
+    return constructors
 
 @dashboard_router.get("/top_drivers_by_wins")
 def get_top_drivers_by_wins(
